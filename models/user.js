@@ -19,5 +19,11 @@ userSchema.statics.findAndValidate = async function (username, password) {
     return isValid ? foundUser : false;
 }
 
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next(); // to not hash every time even why logging in
+    this.password = await bcrypt.hash(this.password,12)
+    next();
+}) 
+
 module.exports = mongoose.model('User', userSchema);
 
