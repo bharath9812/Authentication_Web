@@ -56,6 +56,13 @@ app.get('/login', (req, res) => {
     res.render('login')
 })
 
+app.post('/logout', (req, res) => {
+    req.session.user_id = null;
+    //we can just destroy the session by 
+    req.session.destroy();
+    res.redirect('/login');
+})
+
 app.post('/register', async (req, res) => {
     // res.render('register');
     const { password, username } = req.body;
@@ -77,7 +84,7 @@ app.get('/secret', (req, res) => {
     if (!req.session.user_id) {
         res.redirect('/login')
     }
-    res.send('this can be accessed only when you are signed in');
+    res.render('secret')
 })
 app.listen(3000, () => {
     console.log('Workin at 3000 boss');
