@@ -44,11 +44,12 @@ app.get('/', (req, res) => {
 
 app.post('/login', async (req, res) => {
     // res.render('login');
-    const { password, username } = req.body;
-    const u = await User.findOne({ username });
-    const validPwd = await bcrypt.compare(password, u.password);
-    if (validPwd) {
-        req.session.user_id = u._id
+    const { username, password } = req.body;
+    // const u = await User.findOne({ username });
+    // const validPwd = await bcrypt.compare(password, u.password);
+    const foundUser = await User.findAndValidate(username,password)
+    if (foundUser) {
+        req.session.user_id = foundUser._id
         // res.send("Whelcome");
         res.redirect('/secret');
     }
@@ -81,7 +82,9 @@ app.post('/register', async (req, res) => {
     })
     await user.save();
     // res.send(hash);
-    res.send('Hompage');
+    req.session.user_id = user._id;
+    res.redirect('/');
+    // res.send('Hompage');
 })
 
 app.get('/register', (req, res) => {
