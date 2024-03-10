@@ -27,6 +27,14 @@ async function main() {
     })
 } 
 
+const requireLogin = (req, res, next) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+    next();
+
+}
+
 
 
 
@@ -80,11 +88,12 @@ app.get('/register', (req, res) => {
     res.render('register.ejs');
 })
 
-app.get('/secret', (req, res) => {
-    if (!req.session.user_id) {
-        res.redirect('/login')
-    }
+app.get('/secret',requireLogin, (req, res) => {
     res.render('secret')
+})
+
+app.get('/topsecret', requireLogin,(req, res) => {
+    res.send('heloa')
 })
 app.listen(3000, () => {
     console.log('Workin at 3000 boss');
