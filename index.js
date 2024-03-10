@@ -2,10 +2,14 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const User = require('./models/user');
+const session = require('express-session');
 const path = require('path');
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+
 app.use(express.urlencoded({ extended: true }));
+app.use(session({ secret: 'asecrettobekeptasone' }));
 
 
 const bcrypt = require('bcrypt');
@@ -36,10 +40,12 @@ app.post('/login', async (req, res) => {
     const u = await User.findOne({ username });
     const validPwd = await bcrypt.compare(password, u.password);
     if (validPwd) {
-        res.send("Whelcome");
+        req.session.user_id = u._id
+        // res.send("Whelcome");
+        res.redirect('/secret');
     }
     else {
-        res.send("try again");
+        res.redirect('/login');
     }
 
     
@@ -59,7 +65,8 @@ app.post('/register', async (req, res) => {
         password: hash
     })
     await user.save();
-    res.send(hash);
+    // res.send(hash);
+    res.send('Hompage');
 })
 
 app.get('/register', (req, res) => {
@@ -67,7 +74,10 @@ app.get('/register', (req, res) => {
 })
 
 app.get('/secret', (req, res) => {
-    res.send('you cant access')
+    if (!req.session.user_id) {
+        res.redirect('/login')
+    }
+    res.send('this can be accessed only when you are signed in');
 })
 app.listen(3000, () => {
     console.log('Workin at 3000 boss');
