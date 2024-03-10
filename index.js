@@ -30,6 +30,26 @@ app.get('/', (req, res) => {
     res.send('Home page');
 })
 
+app.post('/login', async (req, res) => {
+    // res.render('login');
+    const { password, username } = req.body;
+    const u = await User.findOne({ username });
+    const validPwd = await bcrypt.compare(password, u.password);
+    if (validPwd) {
+        res.send("Whelcome");
+    }
+    else {
+        res.send("try again");
+    }
+
+    
+})
+
+
+app.get('/login', (req, res) => {
+    res.render('login')
+})
+
 app.post('/register', async (req, res) => {
     // res.render('register');
     const { password, username } = req.body;
